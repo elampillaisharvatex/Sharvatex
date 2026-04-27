@@ -4,6 +4,7 @@ import { testConnection } from '../lib/testConnection'
 import CategoryFilter from '../components/CategoryFilter'
 import ProductGrid from '../components/ProductGrid'
 import { Link } from 'wouter'
+import { Dialog, DialogContent, DialogTrigger } from '../components/ui/dialog'
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" className="fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -20,6 +21,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [whatsappNumber, setWhatsappNumber] = useState("8925677774")
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isLogoOpen, setIsLogoOpen] = useState(false)
 
   // Helper to ensure 10 digit numbers get a country code
   const getWhatsAppUrl = () => {
@@ -78,8 +80,17 @@ export default function Home() {
       <nav className="bg-[#0B3023]/96 backdrop-blur-md sticky top-0 z-50 border-b border-white/5 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/images/logo.jpeg" alt="Sharvatex Logo" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shadow" />
-            <span className="font-display text-white font-semibold text-base sm:text-lg tracking-wide">Sharvatex</span>
+            <Dialog open={isLogoOpen} onOpenChange={setIsLogoOpen}>
+              <DialogTrigger asChild>
+                <img src="/images/logo.jpeg" alt="Sharvatex Logo" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shadow cursor-pointer" />
+              </DialogTrigger>
+              <DialogContent className="p-0 bg-transparent border-0 max-w-md">
+                <img src="/images/logo.jpeg" alt="Sharvatex Logo" className="w-full h-auto rounded-lg" />
+              </DialogContent>
+            </Dialog>
+            <Link href="/">
+              <a className="font-display text-white font-semibold text-base sm:text-lg tracking-wide cursor-pointer">Sharvatex</a>
+            </Link>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <a
