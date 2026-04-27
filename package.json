@@ -70,6 +70,7 @@
         "zod": "^3.25.76"
     },
     "dependencies": {
-        "@supabase/supabase-js": "^2.104.1"
+        "@supabase/supabase-js": "^2.104.1",
+        "tailwind-merge": "^3.5.0"
     }
 }
