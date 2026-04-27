@@ -346,11 +346,11 @@ export default function Admin() {
                     type="text"
                     value={whatsappNumber}
                     onChange={e => setWhatsappNumber(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="919994466665"
+                    placeholder="8925677774"
                     className="w-full border border-gray-200 rounded-r-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Include country code without the '+' (e.g. 919994466665)</p>
+                <p className="text-xs text-gray-500 mt-1">Include country code without the '+' (e.g. 8925677774)</p>
               </div>
               <button
                 type="submit"

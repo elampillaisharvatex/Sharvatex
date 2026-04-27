@@ -5,11 +5,26 @@ type Props = {
   whatsappNumber?: string
 }
 
-export default function ProductCard({ product, whatsappNumber = "919994466665" }: Props) {
-  const whatsappMsg = encodeURIComponent(
-    `Hi, I'm interested in ${product.name} (${product.price})`
-  )
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMsg}`
+export default function ProductCard({ product, whatsappNumber = "8925677774" }: Props) {
+  // Strip all non-numeric characters just in case it has spaces or '+' inside
+  let cleanNumber = (whatsappNumber || "8925677774").replace(/\D/g, '');
+  
+  // If it's exactly 10 digits (no country code), prepend 91 (India)
+  if (cleanNumber.length === 10) {
+    cleanNumber = `91${cleanNumber}`;
+  }
+
+  const message = `Hello! 👋 I am interested in this product from your catalog:
+
+*${product.name}*
+Price: ${product.price}
+
+📸 *Product Image:*
+${product.image_url ? product.image_url : 'No image available'}
+
+Could you please provide more details about availability and bulk pricing?`;
+
+  const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden flex flex-col border border-[#e8e0d0]/80 card-hover shadow-sm">

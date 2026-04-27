@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://wa.me/919994466665">💬 WhatsApp</a>
+  <a href="https://wa.me/918925677774">💬 WhatsApp</a>
 </p>
 
 ---
@@ -131,7 +131,7 @@ Output will be in the `dist/` folder, ready to deploy.
 
 ## 📞 Contact
 
-- **WhatsApp**: [+91 99944 66665](https://wa.me/919994466665)
+- **WhatsApp**: [+91 89256 77774](https://wa.me/918925677774)
 - **Location**: Elampillai, Tamil Nadu, India
 
 ---

@@ -18,8 +18,15 @@ export default function Home() {
   const [category, setCategory] = useState('All')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [whatsappNumber, setWhatsappNumber] = useState("919994466665")
+  const [whatsappNumber, setWhatsappNumber] = useState("8925677774")
   const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Helper to ensure 10 digit numbers get a country code
+  const getWhatsAppUrl = () => {
+    let cln = (whatsappNumber || "8925677774").replace(/\D/g, '');
+    if (cln.length === 10) cln = `91${cln}`;
+    return `https://wa.me/${cln}`;
+  };
 
   const sliderImages = [
     '/images/saree.webp',
@@ -76,7 +83,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <a
-              href={`https://wa.me/${whatsappNumber}`}
+              href={getWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1db954] text-white text-sm font-semibold px-3.5 py-2 rounded-lg transition-all shadow-sm"
@@ -129,7 +136,7 @@ export default function Home() {
           {/* CTA Button */}
           <div className="mt-8 sm:mt-10">
             <a
-              href={`https://wa.me/${whatsappNumber}`}
+              href={getWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#C9A44C] hover:bg-[#b8923e] text-white font-semibold px-6 sm:px-8 py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:shadow-[#C9A44C]/30 text-sm sm:text-base"
@@ -217,7 +224,7 @@ export default function Home() {
             Chat with us on WhatsApp for pricing, bulk discounts & samples.
           </p>
           <a
-            href={`https://wa.me/${whatsappNumber}`}
+            href={getWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1db954] text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-full transition-all shadow-lg hover:shadow-green-900/40 text-sm sm:text-base"
@@ -278,7 +285,7 @@ export default function Home() {
             <div className="text-center sm:text-left">
               <p className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Contact</p>
               <a
-                href={`https://wa.me/${whatsappNumber}`}
+                href={getWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center sm:justify-start gap-2 text-[#25D366] hover:text-white transition-colors text-sm font-medium"
@@ -296,7 +303,7 @@ export default function Home() {
 
       {/* ── Floating WhatsApp Button (mobile only) ── */}
       <a
-        href={`https://wa.me/${whatsappNumber}`}
+        href={getWhatsAppUrl()}
         target="_blank"
         rel="noopener noreferrer"
         className="sm:hidden fixed bottom-5 right-4 z-50 flex items-center gap-2 bg-[#25D366] text-white font-bold px-4 py-3 rounded-full shadow-2xl shadow-green-900/40 hover:bg-[#1db954] transition-all active:scale-95"

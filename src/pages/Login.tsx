@@ -30,7 +30,18 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F3D2E] via-[#1a5c42] to-[#0F3D2E] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0F3D2E] via-[#1a5c42] to-[#0F3D2E] flex items-center justify-center px-4 relative">
+      {/* Back Button */}
+      <button 
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 text-white/80 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Home
+      </button>
+
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">

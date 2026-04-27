@@ -9,7 +9,7 @@ const WhatsAppIcon = () => (
 )
 
 export default function Contact() {
-  const [whatsappNumber, setWhatsappNumber] = useState("919994466665")
+  const [whatsappNumber, setWhatsappNumber] = useState("8925677774")
 
   useEffect(() => {
     async function fetchNumber() {
@@ -18,6 +18,13 @@ export default function Contact() {
     }
     fetchNumber()
   }, [])
+
+  // Helper to ensure 10 digit numbers get a country code
+  const getWhatsAppUrl = () => {
+    let cln = (whatsappNumber || "8925677774").replace(/\D/g, '');
+    if (cln.length === 10) cln = `91${cln}`;
+    return `https://wa.me/${cln}`;
+  };
 
   return (
     <div className="min-h-screen bg-[#f8f5f0] flex flex-col">
@@ -47,7 +54,7 @@ export default function Contact() {
           <p className="text-gray-500 text-sm mb-6">Fastest way to get answers.</p>
           
           <a
-            href={`https://wa.me/${whatsappNumber}`}
+            href={getWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1db954] text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-green-900/10"
