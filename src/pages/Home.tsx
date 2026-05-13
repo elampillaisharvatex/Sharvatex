@@ -19,13 +19,13 @@ export default function Home() {
   const [category, setCategory] = useState('All')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [whatsappNumber, setWhatsappNumber] = useState("8925677774")
+  const [whatsappNumber, setWhatsappNumber] = useState("9994466665")
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isLogoOpen, setIsLogoOpen] = useState(false)
 
   // Helper to ensure 10 digit numbers get a country code
   const getWhatsAppUrl = () => {
-    let cln = (whatsappNumber || "8925677774").replace(/\D/g, '');
+    let cln = (whatsappNumber || "9994466665").replace(/\D/g, '');
     if (cln.length === 10) cln = `91${cln}`;
     return `https://wa.me/${cln}`;
   };
@@ -88,8 +88,11 @@ export default function Home() {
                 <img src="/images/logo.jpeg" alt="Sharvatex Logo" className="w-full h-auto rounded-lg" />
               </DialogContent>
             </Dialog>
-            <Link href="/">
-              <a className="font-display text-white font-semibold text-base sm:text-lg tracking-wide cursor-pointer">Sharvatex</a>
+            <Link
+              href="/"
+              className="font-display text-white font-semibold text-base sm:text-lg tracking-wide cursor-pointer"
+            >
+              Sharvatex
             </Link>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">

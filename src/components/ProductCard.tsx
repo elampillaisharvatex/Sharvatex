@@ -5,9 +5,9 @@ type Props = {
   whatsappNumber?: string
 }
 
-export default function ProductCard({ product, whatsappNumber = "8925677774" }: Props) {
+export default function ProductCard({ product, whatsappNumber = "9994466665" }: Props) {
   // Strip all non-numeric characters just in case it has spaces or '+' inside
-  let cleanNumber = (whatsappNumber || "8925677774").replace(/\D/g, '');
+  let cleanNumber = (whatsappNumber || "9994466665").replace(/\D/g, '');
   
   // If it's exactly 10 digits (no country code), prepend 91 (India)
   if (cleanNumber.length === 10) {

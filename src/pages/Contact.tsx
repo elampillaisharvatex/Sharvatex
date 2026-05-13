@@ -9,7 +9,7 @@ const WhatsAppIcon = () => (
 )
 
 export default function Contact() {
-  const [whatsappNumber, setWhatsappNumber] = useState("8925677774")
+  const [whatsappNumber, setWhatsappNumber] = useState("9994466665")
 
   useEffect(() => {
     async function fetchNumber() {
@@ -21,7 +21,7 @@ export default function Contact() {
 
   // Helper to ensure 10 digit numbers get a country code
   const getWhatsAppUrl = () => {
-    let cln = (whatsappNumber || "8925677774").replace(/\D/g, '');
+    let cln = (whatsappNumber || "9994466665").replace(/\D/g, '');
     if (cln.length === 10) cln = `91${cln}`;
     return `https://wa.me/${cln}`;
   };
