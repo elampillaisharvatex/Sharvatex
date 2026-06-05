@@ -13,6 +13,7 @@ export default function Maintenance() {
     >
       <h1>🚧 Website Under Maintenance</h1>
       <p>We're making some improvements. Please check back later.</p>
+      <h6>Please Contact the Developer for any quires</h6>
     </div>
   );
 }
