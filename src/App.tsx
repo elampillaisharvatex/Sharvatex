@@ -7,6 +7,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
+import Maintenance from "./pages/Maintenance";
 
 function Router() {
   return (
@@ -24,6 +25,12 @@ function Router() {
 }
 
 function App() {
+  const MAINTENANCE_MODE = true;
+
+  if (MAINTENANCE_MODE) {
+    return <Maintenance />;
+  }
+
   return (
     <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
       <Router />
