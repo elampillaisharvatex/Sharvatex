@@ -32,13 +32,14 @@ export default function Admin() {
 
   // Product State
   const [form, setForm] = useState(EMPTY_FORM)
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [adding, setAdding] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [adminCategoryTab, setAdminCategoryTab] = useState<string>('All')
 
   useEffect(() => {
     checkSession();
@@ -101,20 +102,35 @@ export default function Admin() {
   // to prevent fetching before we know if the user is authenticated
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (file.size > 20 * 1024 * 1024) {
-      setFormError('Image must be under 20MB.')
-      return
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    const validFiles = files.filter(f => f.size <= 20 * 1024 * 1024)
+    if (validFiles.length < files.length) {
+      setFormError('Some images were ignored because they exceed 20MB.')
     }
-    setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
-    setFormError(null)
+
+    if (validFiles.length > 0) {
+      setImageFiles(prev => [...prev, ...validFiles])
+      const newPreviews = validFiles.map(f => URL.createObjectURL(f))
+      setImagePreviews(prev => [...prev, ...newPreviews])
+    }
   }
 
-  function clearImage() {
-    setImageFile(null)
-    setImagePreview(null)
+  function removeImage(index: number) {
+    setImageFiles(prev => prev.filter((_, i) => i !== index))
+    setImagePreviews(prev => {
+      const newPreviews = [...prev]
+      URL.revokeObjectURL(newPreviews[index])
+      newPreviews.splice(index, 1)
+      return newPreviews
+    })
+  }
+
+  function clearAllImages() {
+    setImageFiles([])
+    imagePreviews.forEach(p => URL.revokeObjectURL(p))
+    setImagePreviews([])
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -139,26 +155,28 @@ export default function Admin() {
       
       const newProduct = await addProductData(productData)
 
-      // 2. Upload image and create product_images row if photo exists
-      if (imageFile) {
-        const uploadResult = await uploadImage(imageFile);
-        
-        if (!uploadResult) throw new Error("Image upload failed");
+      // 2. Upload images and create product_images row if photos exist
+      if (imageFiles.length > 0) {
+        const uploadPromises = imageFiles.map(async (file) => {
+          const uploadResult = await uploadImage(file);
+          if (!uploadResult) throw new Error("Image upload failed");
 
-        // Save image to product_images table
-        const { error: insertError } = await supabase
-          .from("product_images")
-          .insert({
-            product_id: newProduct.id,
-            image_url: uploadResult.image_url,
-            storage_path: uploadResult.storage_path
-          })
+          const { error: insertError } = await supabase
+            .from("product_images")
+            .insert({
+              product_id: newProduct.id,
+              image_url: uploadResult.image_url,
+              storage_path: uploadResult.storage_path
+            });
 
-        if (insertError) throw new Error("Saving image details failed: " + insertError.message)
+          if (insertError) throw new Error("Saving image details failed: " + insertError.message);
+        });
+
+        await Promise.all(uploadPromises);
       }
 
       setForm(EMPTY_FORM)
-      clearImage()
+      clearAllImages()
       setShowForm(false)
       await fetchProducts()
     } catch (err) {
@@ -435,40 +453,46 @@ export default function Admin() {
 
               {/* Photo Upload */}
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Photo</label>
-                {imagePreview ? (
-                  <div className="relative inline-block">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-40 h-40 object-cover rounded-xl border border-gray-200 shadow-sm"
-                    />
-                    <button
-                      type="button"
-                      onClick={clearImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-red-600 shadow"
-                    >
-                      ×
-                    </button>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Product Photos</label>
+                
+                {imagePreviews.length > 0 && (
+                  <div className="flex gap-3 flex-wrap mb-4">
+                    {imagePreviews.map((preview, idx) => (
+                      <div key={idx} className="relative inline-block">
+                        <img
+                          src={preview}
+                          alt={`Preview ${idx + 1}`}
+                          className="w-24 h-24 object-cover rounded-xl border border-gray-200 shadow-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-red-600 shadow"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#0F3D2E] hover:bg-green-50 transition-all">
-                    <div className="text-center">
-                      <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                      </svg>
-                      <p className="text-sm text-gray-500">Click to upload photo</p>
-                      <p className="text-xs text-gray-400 mt-0.5">JPG, PNG, WEBP up to 20MB</p>
-                    </div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                  </label>
                 )}
+                
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#0F3D2E] hover:bg-green-50 transition-all">
+                  <div className="text-center">
+                    <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <p className="text-sm text-gray-500">Click to upload photos</p>
+                    <p className="text-xs text-gray-400 mt-0.5">JPG, PNG, WEBP up to 20MB</p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
               </div>
             </div>
 
@@ -488,7 +512,7 @@ export default function Admin() {
               </button>
               <button
                 type="button"
-                onClick={() => { setForm(EMPTY_FORM); setFormError(null); clearImage() }}
+                onClick={() => { setForm(EMPTY_FORM); setFormError(null); clearAllImages() }}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors text-sm"
               >
                 Clear
@@ -508,7 +532,27 @@ export default function Admin() {
             <p>No products yet. Add your first product above.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-sm border border-[#e8e0d0] overflow-hidden">
+          <div className="space-y-4">
+            {/* Category Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              <button 
+                onClick={() => setAdminCategoryTab('All')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors border ${adminCategoryTab === 'All' ? 'bg-[#0F3D2E] text-white border-[#0F3D2E]' : 'bg-white text-[#0F3D2E] border-[#e8e0d0] hover:border-[#0F3D2E]'}`}
+              >
+                All
+              </button>
+              {categories.map(c => (
+                <button 
+                  key={c.id}
+                  onClick={() => setAdminCategoryTab(c.id)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors border ${adminCategoryTab === c.id ? 'bg-[#0F3D2E] text-white border-[#0F3D2E]' : 'bg-white text-[#0F3D2E] border-[#e8e0d0] hover:border-[#0F3D2E]'}`}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-[#e8e0d0] overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-[#0F3D2E] text-white">
                 <tr>
@@ -520,7 +564,7 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {products.map((p) => (
+                {products.filter(p => adminCategoryTab === 'All' || p.category_id === adminCategoryTab).map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 font-medium text-[#0F3D2E]">
                       {p.name}
@@ -547,6 +591,7 @@ export default function Admin() {
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
         )}
       </div>

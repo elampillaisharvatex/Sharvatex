@@ -25,7 +25,7 @@ function Router() {
 }
 
 function App() {
-  const MAINTENANCE_MODE = true;
+  const MAINTENANCE_MODE = false; // Set to true to enable maintenance mode
 
   if (MAINTENANCE_MODE) {
     return <Maintenance />;

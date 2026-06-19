@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { getProducts, getSiteSettings, getCategories, type Product, type Category } from '../utils/supabaseClient'
 import { testConnection } from '../lib/testConnection'
-import CategoryFilter from '../components/CategoryFilter'
-import ProductGrid from '../components/ProductGrid'
+import ProductCard from '../components/ProductCard'
 import { Link } from 'wouter'
-import { Dialog, DialogContent, DialogTrigger } from '../components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '../components/ui/dialog'
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" className="fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -84,7 +83,8 @@ export default function Home() {
               <DialogTrigger asChild>
                 <img src="/images/logo.jpeg" alt="Sharvatex Logo" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shadow cursor-pointer" />
               </DialogTrigger>
-              <DialogContent className="p-0 bg-transparent border-0 max-w-md">
+              <DialogContent aria-describedby={undefined} className="p-0 bg-transparent border-0 max-w-md">
+                <DialogTitle className="sr-only">Sharvatex Logo</DialogTitle>
                 <img src="/images/logo.jpeg" alt="Sharvatex Logo" className="w-full h-auto rounded-lg" />
               </DialogContent>
             </Dialog>
@@ -219,11 +219,51 @@ export default function Home() {
           <div className="gold-divider w-12 sm:w-16 mx-auto mt-3 sm:mt-4" />
         </div>
 
-        <div className="mb-6 sm:mb-8">
-          <CategoryFilter selected={category} onChange={setCategory} />
-        </div>
-
-        <ProductGrid products={filtered} loading={loading} error={error} whatsappNumber={whatsappNumber} />
+        {loading ? (
+          <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-6 scrollbar-hide">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="min-w-[260px] sm:min-w-[280px] bg-white rounded-2xl border border-[#e8e0d0]/60 animate-pulse shadow-sm h-[380px]">
+                <div className="bg-gray-200 h-[200px] rounded-t-2xl" />
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-10">{error}</div>
+        ) : categories.length > 0 ? (
+          <div className="space-y-12 sm:space-y-16">
+            {categories.map(cat => {
+              const catProducts = products.filter(p => p.categories?.name === cat.name);
+              if (catProducts.length === 0) return null;
+              
+              return (
+                <div key={cat.id} id={`category-${cat.id}`} className="relative scroll-mt-24">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6 px-1">
+                    <h3 className="text-xl sm:text-2xl font-bold font-display text-[#0F3D2E] flex items-center gap-2">
+                      <span className="text-[#C9A44C] text-sm">✦</span>
+                      {cat.name}
+                    </h3>
+                    <span className="text-xs font-bold bg-[#C9A44C]/10 text-[#C9A44C] px-3 py-1 rounded-full uppercase tracking-wider">
+                      {catProducts.length} items
+                    </span>
+                  </div>
+                  
+                  {/* Horizontal Scroll Container (Netflix Style) */}
+                  <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory px-1">
+                    {catProducts.map(p => (
+                      <div key={p.id} className="min-w-[260px] sm:min-w-[280px] max-w-[280px] snap-start">
+                        <ProductCard product={p} whatsappNumber={whatsappNumber} />
+                      </div>
+                    ))}
+                    {/* Add a spacer at the end so the last item isn't flush with screen edge */}
+                    <div className="min-w-[10px] sm:min-w-[20px] flex-shrink-0" />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="text-center text-gray-500 py-10">No categories found.</div>
+        )}
       </div>
 
       {/* ── Contact Banner ── */}
@@ -272,8 +312,10 @@ export default function Home() {
                     key={cat.id} 
                     className="text-white/30 text-xs hover:text-[#C9A44C] transition-colors cursor-pointer"
                     onClick={() => {
-                      setCategory(cat.name);
-                      window.scrollTo({ top: 300, behavior: 'smooth' });
+                      const element = document.getElementById(`category-${cat.id}`);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
                     }}
                   >
                     {cat.name}
